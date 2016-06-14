@@ -1,4 +1,4 @@
-tumblr-export.py will dump all of the posts from a Tumblr blog into JSON files in a directory.
+tumblr-export.py will dump all of the posts (and images) from a Tumblr blog into JSON files in a directory.
 
 # Installation
 ```
@@ -19,4 +19,4 @@ python3 tumblr-export.py [OUTPUT_DIR]
 If no OUTPUT_DIR is specified, JSON files will be created in the ```tumblr-posts``` directory.
 
 # Output Format
-One JSON file per post, in the specified output directory. Files are named ```<post number>.json```. Each file contains the JSON response from https://www.tumblr.com/docs/en/api/v2#posts.
+One directory per post, with a JSON file and any post images contained in the directory. Directories are named ```<post number>```. Each post file is in the JSON format defined at https://www.tumblr.com/docs/en/api/v2#posts.

@@ -1,9 +1,12 @@
 import requests
-import os
 import dotenv
+from bs4 import BeautifulSoup
+
+import os
 import sys
 import json
 import math
+import urllib
 
 import pdb
 
@@ -40,11 +43,13 @@ def get_post_count():
 	return total_posts
 
 def get_posts(offset):
-	print('Getting posts {} to {}'.format(offset, offset + REQUEST_RANGE), file=sys.stderr)
+	print('Fetching posts {} to {}'.format(offset, offset + REQUEST_RANGE), file=sys.stderr)
 	posts_url = 'https://api.tumblr.com/v2/blog/{}/posts?api_key={}&offset={}'.format(BLOG_IDENTIFIER, API_KEY, offset)
 	resp = get_request(posts_url)
 	json_resp = resp.json()['response']
 	return json_resp['posts']
+
+# Get all the posts.
 
 post_count = get_post_count()
 offset = 0
@@ -55,12 +60,20 @@ while offset < post_count:
 
 posts.reverse()
 
-#pdb.set_trace()
+# Dump the posts and images.
 
 os.makedirs(OUTPUT_DIR)
 
 for idx, post in enumerate(posts):
-	filename = '{}.json'.format(str(idx).zfill(math.ceil(math.log10(post_count))))
-	path = os.path.join(OUTPUT_DIR, filename)
-	with open(path, 'w') as text_file:
+	post_dir = os.path.join(OUTPUT_DIR, str(idx).zfill(math.ceil(math.log10(post_count))))
+	os.makedirs(post_dir)
+	with open(os.path.join(post_dir, '{}.json'.format(post['slug'])), 'w') as text_file:
 		print(json.dumps(post, indent=4), file=text_file)
+
+	soup = BeautifulSoup(post['body'], 'html.parser')
+	imgs = soup.find_all('img')
+	for img in imgs:
+		img_url = img['src']
+		filename = os.path.basename(urllib.parse.urlparse(img_url).path)
+		print('Post {}: fetching {}...'.format(idx, filename), file=sys.stderr)
+		urllib.request.urlretrieve(img_url, os.path.join(post_dir, filename))
