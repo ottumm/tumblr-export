@@ -1,5 +1,10 @@
 tumblr-export.py will dump all of the posts from a Tumblr blog into JSON files in a directory.
 
+# Installation
+```
+pip3 install -r requirements.txt
+```
+
 # Usage
 Set the following environment variables (or use a dotenv file):
 ```
